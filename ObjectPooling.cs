@@ -1,45 +1,70 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class ObjectPooling : Singleton<ObjectPooling>
 {
-    [SerializeField] GameObject bulletPrefabs;
-    [SerializeField] List<GameObject> bullets = new List<GameObject>();
-    [SerializeField] GameObject enemyBulletPrefabs;
-    [SerializeField] List<GameObject> enemyBullets = new List<GameObject>();
+    [SerializeField] GameObject snakePrefab;
+    [SerializeField] GameObject batPrefab;
 
-    public GameObject GetBullet()
+
+    public GameObject GetSnake(int maxCount, List<GameObject> snakeList)
     {
-        foreach(GameObject b in bullets)
+        if (snakeList.Count <maxCount)
         {
-            if (b.activeSelf)
-                continue;
-            return b;
+            GameObject s = Instantiate(snakePrefab, this.transform.position, Quaternion.identity);
+            s.SetActive(false);
+            snakeList.Add(s);
+            return s;
         }
 
-        if (bulletPrefabs == null)
-            bulletPrefabs = Resources.Load<GameObject>("Turret/bullet");
+        else if (snakeList.Count >=maxCount)
+        {
+            foreach (GameObject s in snakeList)
+            {
+                if (s.activeSelf)
+                {
+                    continue;
+                }
+                else if (!s.activeSelf)
+                {
+                    return s;
+                }
+                break;
+            }
+        }
+        
+        return null;
 
-        GameObject b2 = Instantiate(bulletPrefabs, this.transform.position, Quaternion.identity);
-        bullets.Add(b2);
-        return b2;
     }
 
-    public GameObject GetEnemyBullet()
+    public GameObject GetBat(int maxCount, List<GameObject> batList)
     {
-        foreach(GameObject b in enemyBullets)
+        if (batList.Count < maxCount)
         {
-            if (b.activeSelf)
-                continue;
-            return b;
+            GameObject s = Instantiate(batPrefab, this.transform.position, Quaternion.identity);
+            s.SetActive(false);
+            batList.Add(s);
+            return s;
         }
 
-        if (enemyBulletPrefabs == null)
-            enemyBulletPrefabs = Resources.Load<GameObject>("Turret/bullet_Enemy");
+        else if (batList.Count >= maxCount)
+        {
+            foreach (GameObject s in batList)
+            {
+                if (s.activeSelf)
+                {
+                    continue;
+                }
+                else if (!s.activeSelf)
+                {
+                    return s;
+                }
+                break;
+            }
+        }
 
-        GameObject b2 = Instantiate((enemyBulletPrefabs), this.transform.position, Quaternion.identity);
-        enemyBullets.Add(b2);
-        return b2;
+        return null;
+
     }
+
 }

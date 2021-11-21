@@ -1,25 +1,66 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
-public class CameraMoving : MonoBehaviour
+
+public class CameraMoving : Singleton<CameraMoving>
 {
-    PlayerController Player;
-    Vector3 Tartget;
-    [SerializeField] float Speed = 1;
-    [SerializeField] Vector2 offSet = Vector2.zero;
-    // Start is called before the first frame update
-    void Start()
+    public int speed, minXToFollow, maxXToFollow;
+    float shakeTime, shakePower;
+    [SerializeField] MapData mapDt;
+
+    [SerializeField] Vector3 offSet;
+    Vector3 target;
+
+    [SerializeField] GameObject character;
+
+
+    private void Start()
     {
-        Player = PlayerController.Instant;
+        this.transform.position = character.transform.position;
+        minXToFollow = mapDt.minX1;
+        maxXToFollow = mapDt.maxX1;
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        Tartget = (Vector2)Player.transform.position - offSet;
-        Tartget.z = -10;
 
-        this.transform.position = Vector3.Lerp(this.transform.position, Tartget, Speed * Time.deltaTime);
+        if (!character || character.transform.position.x >= maxXToFollow || character.transform.position.x <= minXToFollow)
+            return;
+
+        FollowCharacter();
     }
+
+    private void LateUpdate()
+    {
+        if (shakeTime >0)
+        {
+            shakeTime -= Time.deltaTime;
+
+            float x = Random.Range(-1f, 1f) * shakePower;
+            float y = Random.Range(-1f, 1f) * shakePower;
+
+            this.transform.position += new Vector3(x, y, -10);
+        }
+
+    }
+
+
+    void FollowCharacter()
+    {
+        target = character.transform.position - offSet;
+        target.z = -10;
+
+        this.transform.position = Vector3.Lerp(this.transform.position, target, speed * Time.fixedDeltaTime);
+
+    }
+
+    public void StartShake(float time, float power)
+    {
+        shakeTime = time;
+        shakePower = power;
+
+    }
+    
+    
 }

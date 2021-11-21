@@ -1,12 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class ClickGameObject : MonoBehaviour
 {
 
     public UnityEvent OnClick = new UnityEvent();
+    [SerializeField] GameObject effectParticle;
+
+    private void OnEnable()
+    {
+
+    }
 
     // Use this for initialization
     void Start()
@@ -18,22 +22,37 @@ public class ClickGameObject : MonoBehaviour
     void Update()
     {
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        
 
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 rayDir = Camera.main.transform.position - mousePos;
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, rayDir);
 
-            RaycastHit2D hit = Physics2D.Raycast(mousePos, rayDir);
+            //Debug.DrawRay(mousePos, rayDir, Color.yellow,2f);
 
-            //Debug.DrawRay(mousePos, rayDir);
-            
-            if(hit.collider.gameObject == this.gameObject && Vector3.Distance((Vector2)mousePos, (Vector2)hit.collider. transform.position) <= 0.4f)
+            foreach (var hit in hits)
             {
-                Debug.Log(hit.collider.name);
+                if (hit.collider.gameObject == this.gameObject && Vector2.Distance(mousePos, hit.collider.transform.position) <= 0.5f)
+                {
+                    //OnClick.Invoke();
+
+                    Instantiate(effectParticle, this.transform.position, Quaternion.identity);
+
+                    GameManager.Instant.IncreaseSoul();
+
+                    gameObject.SetActive(false);
+
+                    
+                }
             }
+
         }
+
     }
 
-    
+    private void OnMouseDown()
+    {
+
+    }
+
 }
